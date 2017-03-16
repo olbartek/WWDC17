@@ -67,83 +67,6 @@ public class RubiksCube: SCNNode {
     
 }
 
-public extension RubiksCube {
-    
-    fileprivate func animateMove(_ move: CubeMove) {
-        guard let scene = scene else { return }
-        print("Animate move started " + move.moveNotation)
-        let rotateNode = SCNNode()
-        scene.rootNode.addChildNode(rotateNode)
-        
-        let comparisonClosure: (_ node: SCNNode) -> Bool = { node in
-            let position: CGFloat
-            let offset: CGFloat
-            switch move.faceType {
-            case .up:
-                position = node.position.y
-                offset = 1
-            case .down:
-                position = node.position.y
-                offset = -1
-            case .back:
-                position = node.position.z
-                offset = -1
-            case .front:
-                position = node.position.z
-                offset = 1
-            case .left:
-                position = node.position.x
-                offset = -1
-            case .right:
-                position = node.position.x
-                offset = 1
-            }
-            return abs(position - offset) < 0.001
-        }
-        
-        let cubeletsToAnimate = cubelets.filter { node in
-            return comparisonClosure(node)
-        }
-        _ = cubeletsToAnimate.map { rotateNode.addChildNode($0) }
-        
-        SCNTransaction.begin()
-        SCNTransaction.animationDuration = move.animationDuration
-        
-        switch move.faceType {
-        case .left, .right:
-            rotateNode.eulerAngles.x += move.angle
-        case .up, .down:
-            rotateNode.eulerAngles.y += move.angle
-        case .front, .back:
-            rotateNode.eulerAngles.z += move.angle
-        }
-        
-        SCNTransaction.completionBlock = {
-            rotateNode.enumerateChildNodes { cubelet, _ in
-                cubelet.transform = cubelet.worldTransform
-                cubelet.removeFromParentNode()
-                scene.rootNode.addChildNode(cubelet)
-            }
-            rotateNode.removeFromParentNode()
-            print("Animate move finished " + move.moveNotation)
-        }
-        SCNTransaction.commit()
-    }
-    
-    func animateMoveString(_ moveNotation: String) {
-        guard let cubeMove = CubeMove(moveNotation: moveNotation) else { return }
-        animateMove(cubeMove)
-    }
-    
-    public func animateMoves(_ moves: [CubeMove]) {
-        for (index, move) in moves.enumerated() {
-            perform(#selector(animateMoveString(_:)), with: move.moveNotation, afterDelay: TimeInterval(Double(index) * (move.animationDuration + move.animationDelay)))
-        }
-    }
-    
-}
-
-
 extension RubiksCube {
     
     public func animateRotateMoves(_ moves: [CubeMove], scene: SCNScene) {
@@ -218,5 +141,4 @@ extension RubiksCube {
 
         return SCNAction.sequence([preAction, action, postAction])
     }
-
 }
