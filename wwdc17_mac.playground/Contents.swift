@@ -32,14 +32,12 @@ cameraNode.pivot = SCNMatrix4MakeTranslation(0, 0, -8)
 
 PlaygroundPage.current.liveView = sceneView
 
-let cubeMoveNotations = ["L", "R2", "L", "R2", "L", "R2"]
+let cubeMoveNotations = ["U'", "L", "R2'", "F", "B'", "R", "D", "L'", "F2"]
 let cubeMoves: [CubeMove] = cubeMoveNotations.flatMap(CubeMove.init)
-cubeMoves
-
 let reversedCubeMoves = Array(cubeMoves.reversed())
     .map{ (move: CubeMove) -> CubeMove in
     return move.reversed
 }
-reversedCubeMoves
 
-rubiksCube.animateMoves(cubeMoves + reversedCubeMoves)
+rubiksCube.animateRotateMoves(cubeMoves + reversedCubeMoves,
+                              scene: sceneView.scene!)

@@ -142,3 +142,81 @@ public extension RubiksCube {
     }
     
 }
+
+
+extension RubiksCube {
+    
+    public func animateRotateMoves(_ moves: [CubeMove], scene: SCNScene) {
+        let rotateNode = SCNNode()
+        scene.rootNode.addChildNode(rotateNode)
+        
+        var actions: [SCNAction] = []
+        for move in moves {
+            let action = rotateAction(with: move, from: rotateNode, insideScene: scene)
+            actions.append(action)
+        }
+        actions.append(SCNAction.removeFromParentNode())
+        let sequence = SCNAction.sequence(actions)
+        rotateNode.runAction(sequence)
+    }
+    
+    func rotateAction(with move: CubeMove, from rotateNode: SCNNode, insideScene scene: SCNScene) -> SCNAction {
+        
+        let preAction = SCNAction.run { (rotateNode) in
+            
+            let comparisonClosure: (_ node: SCNNode) -> Bool = { node in
+                let position: CGFloat
+                let offset: CGFloat
+                switch move.faceType {
+                case .up:
+                    position = node.position.y
+                    offset = 1
+                case .down:
+                    position = node.position.y
+                    offset = -1
+                case .back:
+                    position = node.position.z
+                    offset = -1
+                case .front:
+                    position = node.position.z
+                    offset = 1
+                case .left:
+                    position = node.position.x
+                    offset = -1
+                case .right:
+                    position = node.position.x
+                    offset = 1
+                }
+                return abs(position - offset) < 0.001
+            }
+            
+            let cubeletsToAnimate = self.cubelets.filter { node in
+                return comparisonClosure(node)
+            }
+            _ = cubeletsToAnimate.map { rotateNode.addChildNode($0) }
+        }
+        
+        let vector: SCNVector3
+        switch move.faceType {
+        case .left, .right:
+            vector = SCNVector3(1, 0, 0)
+        case .up, .down:
+            vector = SCNVector3(0, 1, 0)
+        case .front, .back:
+            vector = SCNVector3(0, 0, 1)
+        }
+        let action = SCNAction.rotate(by: -move.angle, around: vector, duration: move.animationDuration)
+        
+        let postAction = SCNAction.run { (rotateNode) in
+            rotateNode.enumerateChildNodes { cubelet, _ in
+                cubelet.transform = cubelet.worldTransform
+                cubelet.removeFromParentNode()
+                scene.rootNode.addChildNode(cubelet)
+            }
+            rotateNode.eulerAngles = SCNVector3(0, 0, 0)
+        }
+
+        return SCNAction.sequence([preAction, action, postAction])
+    }
+
+}

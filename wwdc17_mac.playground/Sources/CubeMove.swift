@@ -49,7 +49,7 @@ public struct CubeMove {
     
     fileprivate let _angle: CGFloat
     fileprivate let scanner: Scanner
-    fileprivate static let defaultAnimationDuration: Double = 0.1
+    fileprivate static let defaultAnimationDuration: Double = 0.3
     fileprivate static let defaultAnimationDelay: Double = 0.1
     
     // MARK: - Initialization

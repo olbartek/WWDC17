@@ -3,40 +3,39 @@
    version = "3.0">
    <TimelineItems>
       <LoggerValueHistoryTimelineItem
-         documentLocation = "#CharacterRangeLen=0&amp;CharacterRangeLoc=139&amp;EndingColumnNumber=15&amp;EndingLineNumber=7&amp;StartingColumnNumber=5&amp;StartingLineNumber=6&amp;Timestamp=511297278.300314"
+         documentLocation = "#CharacterRangeLen=0&amp;CharacterRangeLoc=139&amp;EndingColumnNumber=15&amp;EndingLineNumber=6&amp;StartingColumnNumber=5&amp;StartingLineNumber=6&amp;Timestamp=511355248.458258"
          selectedRepresentationIndex = "0"
          shouldTrackSuperviewWidth = "NO">
       </LoggerValueHistoryTimelineItem>
       <LoggerValueHistoryTimelineItem
-         documentLocation = "#CharacterRangeLen=10&amp;CharacterRangeLoc=114&amp;EndingColumnNumber=15&amp;EndingLineNumber=7&amp;StartingColumnNumber=5&amp;StartingLineNumber=6&amp;Timestamp=511297278.300503"
+         documentLocation = "#CharacterRangeLen=10&amp;CharacterRangeLoc=114&amp;EndingColumnNumber=15&amp;EndingLineNumber=6&amp;StartingColumnNumber=5&amp;StartingLineNumber=6&amp;Timestamp=511355248.458461"
          selectedRepresentationIndex = "0"
          shouldTrackSuperviewWidth = "NO">
       </LoggerValueHistoryTimelineItem>
       <LoggerValueHistoryTimelineItem
-         documentLocation = "#CharacterRangeLen=0&amp;CharacterRangeLoc=1109&amp;EndingColumnNumber=62&amp;EndingLineNumber=39&amp;StartingColumnNumber=51&amp;StartingLineNumber=38&amp;Timestamp=511309640.773297"
+         documentLocation = "#CharacterRangeLen=0&amp;CharacterRangeLoc=1098&amp;EndingColumnNumber=62&amp;EndingLineNumber=37&amp;StartingColumnNumber=51&amp;StartingLineNumber=36&amp;Timestamp=511389767.443358"
          selectedRepresentationIndex = "0"
          shouldTrackSuperviewWidth = "NO">
       </LoggerValueHistoryTimelineItem>
       <LoggerValueHistoryTimelineItem
-         documentLocation = "#CharacterRangeLen=0&amp;CharacterRangeLoc=1109&amp;EndingColumnNumber=69&amp;EndingLineNumber=39&amp;StartingColumnNumber=58&amp;StartingLineNumber=38&amp;Timestamp=511309640.773416"
+         documentLocation = "#CharacterRangeLen=0&amp;CharacterRangeLoc=1098&amp;EndingColumnNumber=69&amp;EndingLineNumber=37&amp;StartingColumnNumber=58&amp;StartingLineNumber=36&amp;Timestamp=511389767.445281"
          selectedRepresentationIndex = "0"
          shouldTrackSuperviewWidth = "NO">
       </LoggerValueHistoryTimelineItem>
       <LoggerValueHistoryTimelineItem
-         documentLocation = "#CharacterRangeLen=1&amp;CharacterRangeLoc=1109&amp;EndingColumnNumber=18&amp;EndingLineNumber=42&amp;StartingColumnNumber=1&amp;StartingLineNumber=42&amp;Timestamp=511309640.773636"
+         documentLocation = "#CharacterRangeLen=1&amp;CharacterRangeLoc=1098&amp;EndingColumnNumber=18&amp;EndingLineNumber=40&amp;StartingColumnNumber=1&amp;StartingLineNumber=40&amp;Timestamp=511389767.445525"
          lockedSize = "{178, 75}"
          selectedRepresentationIndex = "0"
          shouldTrackSuperviewWidth = "NO">
       </LoggerValueHistoryTimelineItem>
       <LoggerValueHistoryTimelineItem
-         documentLocation = "#CharacterRangeLen=17&amp;CharacterRangeLoc=1092&amp;EndingColumnNumber=18&amp;EndingLineNumber=42&amp;StartingColumnNumber=1&amp;StartingLineNumber=42&amp;Timestamp=511309640.773859"
+         documentLocation = "#CharacterRangeLen=0&amp;CharacterRangeLoc=1098&amp;EndingColumnNumber=18&amp;EndingLineNumber=40&amp;StartingColumnNumber=1&amp;StartingLineNumber=40&amp;Timestamp=511389767.446784"
          lockedSize = "{178, 145}"
          selectedRepresentationIndex = "0"
          shouldTrackSuperviewWidth = "NO">
       </LoggerValueHistoryTimelineItem>
       <LoggerValueHistoryTimelineItem
-         documentLocation = "#CharacterRangeLen=9&amp;CharacterRangeLoc=960&amp;EndingColumnNumber=10&amp;EndingLineNumber=36&amp;StartingColumnNumber=1&amp;StartingLineNumber=36&amp;Timestamp=511309640.77406"
-         lockedSize = "{178, 140}"
+         documentLocation = "file:///Users/bartosz/Library/Developer/Xcode%20Projects/_Playgrounds/wwdc17/wwdc17_mac.playground#CharacterRangeLen=25&amp;CharacterRangeLoc=140&amp;EndingLineNumber=8&amp;StartingLineNumber=8&amp;Timestamp=511355248.459235"
          selectedRepresentationIndex = "0"
          shouldTrackSuperviewWidth = "NO">
       </LoggerValueHistoryTimelineItem>
