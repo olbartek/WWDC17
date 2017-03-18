@@ -66,31 +66,30 @@ class CubeController: NSViewController {
         super.viewDidLoad()
         setupScene()
         setupGestures()
+        rubiksCube.animateRotateMoves(cubeMoves, scene: scene)
     }
     
     // MARK: - Scene setup
     
     fileprivate func setupScene() {
-        setupRubiksCube()
         setupCameraNode()
+        setupRubiksCube()
     }
     
     fileprivate func setupRubiksCube() {
         rubiksCube.scene = scene
-        rubiksCube.scale = SCNVector3(0.5, 0.5, 0.5)
         scene.rootNode.addChildNode(rubiksCube)
     }
     
     fileprivate func setupCameraNode() {
         let camera = SCNCamera()
         camera.automaticallyAdjustsZRange = true
-        let cameraNode = SCNNode()
+        cameraNode = SCNNode()
         cameraNode.camera = camera
         scene.rootNode.addChildNode(cameraNode)
         
         cameraNode.position = SCNVector3Make(0, 0, 0)
-        cameraNode.pivot = SCNMatrix4MakeTranslation(0, 0, -8)
-        self.cameraNode = cameraNode
+        cameraNode.pivot = SCNMatrix4MakeTranslation(0, 0, -15)
     }
     
     // MARK: - Gestures
@@ -120,11 +119,7 @@ class CubeController: NSViewController {
 }
 
 let vc = CubeController(cube: rubiksCube)
-PlaygroundPage.current.liveView = vc!.view
-
-
-//rubiksCube.animateRotateMoves(cubeMoves + reversedCubeMoves,
-//                              scene: sceneView.scene!)
+PlaygroundPage.current.liveView = vc
 
 
 //: [Next Topic](@next)
