@@ -59,9 +59,16 @@ public class RubiksCube: SCNNode {
     
 }
 
+// MARK: - Rotation of sides
+
 extension RubiksCube {
     
-    public func animateRotateMoves(_ moves: [CubeMove], scene: SCNScene) {
+    public func rotateMove(_ move: CubeMove) {
+        rotateMoves([move])
+    }
+    
+    public func rotateMoves(_ moves: [CubeMove]) {
+        guard let scene = scene else { return }
         let rotateNode = SCNNode()
         scene.rootNode.addChildNode(rotateNode)
         
@@ -132,5 +139,19 @@ extension RubiksCube {
         }
 
         return SCNAction.sequence([preAction, action, postAction])
+    }
+}
+
+// MARK: - Rotation around axes
+
+extension RubiksCube {
+    
+    private func rotateAction(around axis: SCNVector3, by angle: CGFloat, duration: Double) -> SCNAction {
+        return SCNAction.rotate(by: -angle, around: axis, duration: duration)
+    }
+    
+    public func rotate(around axis: SCNVector3, by angle: CGFloat, duration: Double) {
+        let action = rotateAction(around: axis, by: angle, duration: duration)
+        runAction(action)
     }
 }
