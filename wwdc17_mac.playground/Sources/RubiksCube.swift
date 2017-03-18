@@ -4,8 +4,6 @@ fileprivate struct Material {
     static func material(withColor color: NSColor) -> SCNMaterial {
         let mat = SCNMaterial()
         mat.diffuse.contents = color
-        mat.diffuse.wrapS = .clampToBorder
-        mat.diffuse.wrapT = .clampToBorder
         mat.specular.contents = NSColor.white
         return mat
     }
@@ -22,15 +20,9 @@ fileprivate struct Material {
 public class RubiksCube: SCNNode {
     
     // MARK: - Properties
-    
-    let cubeWidth: Float = 0.95
-    let spaceBetweenCubes: Float = 0.05
 
     public weak var scene: SCNScene?
     
-    fileprivate var cubeOffsetDistance: Float {
-        return (cubeWidth + spaceBetweenCubes) / 2
-    }
     fileprivate var cubelets: [SCNNode] = []
     
     // MARK: - Initialization
