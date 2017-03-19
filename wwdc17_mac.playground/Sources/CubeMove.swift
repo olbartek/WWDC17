@@ -44,8 +44,8 @@ public struct CubeMove {
         print(moveNotation)
         return CubeMove(moveNotation: moveNotation)!
     }
-    private(set) var animationDuration: Double
-    private(set) var animationDelay: Double
+    public var animationDuration: Double
+    public var animationDelay: Double
     
     fileprivate let _angle: CGFloat
     fileprivate let scanner: Scanner
@@ -90,4 +90,23 @@ extension CubeMove: CustomPlaygroundQuickLookable {
     public var customPlaygroundQuickLook: PlaygroundQuickLook {
         return PlaygroundQuickLook(reflecting: moveNotation)
     }
+}
+
+extension CubeMove {
+    
+    static func randomMoves(withNumber number: Int) -> [CubeMove] {
+        return (0..<number).map{ _ in return randomMove() }
+    }
+    
+    fileprivate static func randomMove() -> CubeMove {
+        let randomInt = arc4random_uniform(UInt32(FaceType.allFaceTypes.count))
+        let randomNotation_faceType = FaceType.allFaceTypes[Int(randomInt)].rawValue
+        let randomNotation_angle = arc4random_uniform(1) == 0 ? "" : "2"
+        let randomNotation_reverse = arc4random_uniform(1) == 1 ? "'" : ""
+        let randomNotation = randomNotation_faceType +
+                            randomNotation_angle +
+                            randomNotation_reverse
+        return CubeMove(moveNotation: randomNotation)!
+    }
+    
 }

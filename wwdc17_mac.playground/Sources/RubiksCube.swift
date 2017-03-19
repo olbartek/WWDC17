@@ -24,12 +24,22 @@ public class RubiksCube: SCNNode {
     public weak var scene: SCNScene?
     
     fileprivate var cubelets: [SCNNode] = []
+    fileprivate var shuffled: Bool = false
     
     // MARK: - Initialization
     
     override public init() {
         super.init()
         
+        addInitialCubes()
+    }
+    
+    @available(*, unavailable)
+    required public init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    fileprivate func addInitialCubes() {
         for x in -1...1 {
             for y in -1...1 {
                 for z in -1...1 {
@@ -52,11 +62,21 @@ public class RubiksCube: SCNNode {
         }
     }
     
-    @available(*, unavailable)
-    required public init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+    public func reset() {
+        shuffled = false
+        _ = cubelets.map{ $0.removeFromParentNode() }
+        cubelets = []
+        addInitialCubes()
     }
     
+}
+
+// MARK: - Flat Representation
+
+extension RubiksCube {
+    public var flatRepresentation: CubeFlatRepresentation {
+        return CubeFlatRepresentation(cubelets: cubelets)
+    }
 }
 
 // MARK: - Rotation of sides
@@ -67,7 +87,7 @@ extension RubiksCube {
         rotateMoves([move])
     }
     
-    public func rotateMoves(_ moves: [CubeMove]) {
+    public func rotateMoves(_ moves: [CubeMove], autorepeat: Bool = false) {
         guard let scene = scene else { return }
         let rotateNode = SCNNode()
         scene.rootNode.addChildNode(rotateNode)
@@ -77,7 +97,13 @@ extension RubiksCube {
             let action = rotateAction(with: move, from: rotateNode, insideScene: scene)
             actions.append(action)
         }
-        actions.append(SCNAction.removeFromParentNode())
+        if autorepeat {
+            actions.append(SCNAction.run({ _ in
+                self.rotateMoves(moves, autorepeat: autorepeat)
+            }))
+        } else {
+            actions.append(SCNAction.removeFromParentNode())
+        }
         let sequence = SCNAction.sequence(actions)
         rotateNode.runAction(sequence)
     }
@@ -139,6 +165,10 @@ extension RubiksCube {
         }
 
         return SCNAction.sequence([preAction, action, postAction])
+    }
+    
+    public func shuffle() {
+        shuffled = true
     }
 }
 

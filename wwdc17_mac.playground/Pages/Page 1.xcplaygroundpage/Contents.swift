@@ -12,11 +12,12 @@ import Cocoa
 import SceneKit
 import PlaygroundSupport
 
-let rubiksCube = RubiksCube()
+let demoCube = QuickLookableRubiksCube()
+
+let flatRepresentation = demoCube.flatRepresentation
 
 
-
-let cubeMoveNotations = ["U'", "L", "R2'", "F", "B'", "R", "D", "L'", "F2"]
+let cubeMoveNotations = ["R", "L", "U2", "F", "U'", "D", "F2", "R2", "B2", "L", "U2", "F'", "B'", "U", "R2", "D", "F2", "U", "R2", "U"]
 let cubeMoves: [CubeMove] = cubeMoveNotations.flatMap(CubeMove.init)
 let reversedCubeMoves = Array(cubeMoves.reversed())
     .map{ (move: CubeMove) -> CubeMove in
@@ -28,6 +29,13 @@ let reversedCubeMoves = Array(cubeMoves.reversed())
 class CubeController: NSViewController {
     
     // MARK: - Properties
+    
+    enum PanDirection {
+        case topToBottom
+        case bottomToTop
+        case leftToRight
+        case rightToLeft
+    }
     
     static let viewSize: CGSize = CGSize(width: 500.0, height: 500.0)
 
@@ -58,6 +66,7 @@ class CubeController: NSViewController {
     override func loadView() {
         let sceneView = SCNView(frame: CGRect(origin: .zero, size: CubeController.viewSize))
         sceneView.scene = SCNScene()
+        sceneView.scene?.background.contents = NSImage(named: "radial_gradient_bg")
         sceneView.backgroundColor = NSColor.lightGray
         self.view = sceneView
     }
@@ -65,13 +74,23 @@ class CubeController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupScene()
-        //setupGestures()
-        //rubiksCube.rotateMoves(cubeMoves, scene: scene)
+        setupGestures()
+    }
+    
+    override func viewDidAppear() {
+        super.viewDidAppear()
+        print("DID APPEAR")
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            self.rubiksCube.rotate(around: SCNVector3(0, 1, 0), by: CGFloat.pi / 4, duration: 2)
-        }
+//        let animation = CABasicAnimation(keyPath: "rotation.w")
+//        animation.toValue = 2 * CGFloat.pi
+//        animation.duration = 2
+//        animation.repeatCount = .infinity
+//        rubiksCube.addAnimation(animation, forKey: "some animation")
         
+        let foreverMovingCameraAction = SCNAction.repeatForever(SCNAction.rotate(by: 2 * CGFloat.pi, around: SCNVector3(0, 1, 0), duration: 2.0))
+        cameraNode.runAction(foreverMovingCameraAction, forKey: "rotateCameraAction")
+        
+        rubiksCube.rotateMoves(cubeMoves + reversedCubeMoves, autorepeat: true)
     }
     
     // MARK: - Scene setup
@@ -79,8 +98,8 @@ class CubeController: NSViewController {
     fileprivate func setupScene() {
         setupCameraNode()
         setupRubiksCube()
-        addLights()
-        addFlor()
+        //addLights()
+        //addFlor()
     }
     
     fileprivate func setupCameraNode() {
@@ -93,7 +112,7 @@ class CubeController: NSViewController {
         cameraNode.position = SCNVector3Make(0, 0, 0)
         cameraNode.eulerAngles.y = CGFloat.pi / 4
         cameraNode.eulerAngles.x = -CGFloat.pi / 6
-        cameraNode.pivot = SCNMatrix4MakeTranslation(0, 0, -15)
+        cameraNode.pivot = SCNMatrix4MakeTranslation(0, 0, -10)
     }
     
     fileprivate func setupRubiksCube() {
@@ -102,24 +121,20 @@ class CubeController: NSViewController {
     }
     
     fileprivate func addLights() {
-        // add an ambient light
         let ambientLight = SCNNode()
         ambientLight.light = SCNLight()
         ambientLight.light?.type = .ambient
         ambientLight.light?.color = NSColor(white: 0.05, alpha: 1.0)
         scene.rootNode.addChildNode(ambientLight)
         
-        //add a key light to the scene
         let lightNode = SCNNode()
         lightNode.light = SCNLight()
         lightNode.light?.type = .spot
-        lightNode.light?.castsShadow = true
         lightNode.light?.color = NSColor(white: 0.8, alpha: 1.0)
-        lightNode.position = SCNVector3(0, 80, 30)
-        lightNode.rotation = SCNVector4(1, 0, 0, -CGFloat.pi / 2.8);
+        lightNode.position = SCNVector3(250, 500, 500)
+        lightNode.rotation = SCNVector4(1, 0, 0, -CGFloat.pi / 4);
         lightNode.light?.spotInnerAngle = 0
         lightNode.light?.spotOuterAngle = 50
-        lightNode.light?.shadowColor = NSColor.black
         lightNode.light?.zFar = 500
         lightNode.light?.zNear = 50
         scene.rootNode.addChildNode(lightNode)
@@ -141,6 +156,15 @@ class CubeController: NSViewController {
         scene.rootNode.addChildNode(floorNode2)
     }
     
+    fileprivate func presentScene() {
+        SCNTransaction.begin()
+        SCNTransaction.animationDuration = 1.5
+        
+        cameraNode.pivot = SCNMatrix4MakeTranslation(0, 0, -12)
+        
+        SCNTransaction.commit()
+    }
+    
     // MARK: - Gestures
     
     fileprivate func setupGestures() {
@@ -148,78 +172,68 @@ class CubeController: NSViewController {
         sceneView.addGestureRecognizer(panGesture)
     }
     
-    var previousPanTranslation: NSPoint?
-    let maxRotation: Float = GLKMathDegreesToRadians(360)
+    fileprivate func panDirection(from gesture: NSPanGestureRecognizer) -> PanDirection {
+        let translation = gesture.translation(in: gesture.view)
+        print(translation)
+        if abs(translation.y) > abs(translation.x) {
+            return translation.y > 0 ? .bottomToTop : .topToBottom
+        } else {
+            return translation.x > 0 ? .rightToLeft : .leftToRight
+        }
+    }
     
-    func didPan(_ recognizer: NSPanGestureRecognizer) {
-        
-        switch recognizer.state
-        {
+    var panDirection: PanDirection?
+    
+    func didPan(_ gesture: NSPanGestureRecognizer) {
+        switch gesture.state {
         case .began:
-            self.previousPanTranslation = .zero
-            
+            panDirection = panDirection(from: gesture)
         case .changed:
-            guard let previous = self.previousPanTranslation else
-            {
-                assertionFailure("Attempt to unwrap previous pan translation failed.")
-                
-                return
+            break
+        case .ended:
+            guard let panDirection = panDirection else { return }
+            let location = gesture.location(in: sceneView)
+            let vector: SCNVector3
+            let angle: CGFloat
+            let isLeftSidePan = location.x < CubeController.viewSize.width / 2
+            switch panDirection {
+            case .topToBottom:
+                if isLeftSidePan {
+                    vector = SCNVector3(1, 0, 0)
+                    angle = -CGFloat.pi / 2
+                } else {
+                    vector = SCNVector3(0, 0, 1)
+                    angle = CGFloat.pi / 2
+                }
+                print("Top to bottom")
+            case .bottomToTop:
+                if isLeftSidePan {
+                    vector = SCNVector3(1, 0, 0)
+                    angle = CGFloat.pi / 2
+                } else {
+                    vector = SCNVector3(0, 0, 1)
+                    angle = -CGFloat.pi / 2
+                }
+                print("Bottom to top")
+            case .leftToRight:
+                vector = SCNVector3(0, 1, 0)
+                angle = CGFloat.pi / 2
+                print("Left to right")
+            case .rightToLeft:
+                vector = SCNVector3(0, 1, 0)
+                angle = -CGFloat.pi / 2
+                print("Right to left")
             }
-            
-            // Calculate how much translation occurred between this step and the previous step
-            let translation = recognizer.translation(in: recognizer.view)
-            let translationDelta = CGPoint(x: translation.x - previous.x, y: translation.y - previous.y)
-            
-            let orientation = cameraNode.orientation
-            
-            // Use the pan translation along the x axis to adjust the camera's rotation about the y axis (side to side navigation).
-            let yScalar = Float(translationDelta.x / sceneView.bounds.size.width * 5)
-            let yRadians = yScalar * maxRotation
-            
-            // Use the pan translation along the y axis to adjust the camera's rotation about the x axis (up and down navigation).
-            let xScalar = Float(translationDelta.y / sceneView.bounds.size.height * 5)
-            let xRadians = xScalar * maxRotation
-            
-            // Represent the orientation as a GLKQuaternion
-            var glQuaternion = GLKQuaternionMake(Float(orientation.x), Float(orientation.y), Float(orientation.z), Float(orientation.w))
-            
-            // Perform up and down rotations around *CAMERA* X axis (note the order of multiplication)
-            let xMultiplier = GLKQuaternionMakeWithAngleAndAxis(xRadians, 1, 0, 0)
-            glQuaternion = GLKQuaternionMultiply(glQuaternion, xMultiplier)
-            
-            // Perform side to side rotations around *WORLD* Y axis (note the order of multiplication, different from above)
-            let yMultiplier = GLKQuaternionMakeWithAngleAndAxis(yRadians, 0, 1, 0)
-            glQuaternion = GLKQuaternionMultiply(yMultiplier, glQuaternion)
-            
-            cameraNode.orientation = SCNQuaternion(x: CGFloat(glQuaternion.x), y: CGFloat(glQuaternion.y), z: CGFloat(glQuaternion.z), w: CGFloat(glQuaternion.w))
-            self.previousPanTranslation = translation
-            
-        case .ended, .cancelled, .failed:
-            self.previousPanTranslation = nil
-            
-        case .possible:
+            rubiksCube.rotate(around: vector, by: angle, duration: 2)
+            self.panDirection = nil
+        default:
             break
         }
         
-        
-//        let xVelocity = Float(gesture.velocity(in: sceneView).x)
-//        let yVelocity = Float(gesture.velocity(in: sceneView).y)
-//        
-//        let oldRot = cameraNode.rotation as SCNQuaternion
-//        var rot = GLKQuaternionMakeWithAngleAndAxis(Float(oldRot.w), Float(oldRot.x), Float(oldRot.y), Float(oldRot.z))
-//        
-//        let rotX = GLKQuaternionMakeWithAngleAndAxis(-xVelocity / Float(sceneView.bounds.size.width) * 5, 0, 1, 0)
-//        let rotY = GLKQuaternionMakeWithAngleAndAxis(-yVelocity / Float(sceneView.bounds.size.height) * 5, 1, 0, 0)
-//        let netRot = GLKQuaternionMultiply(rotX, rotY)
-//        rot = GLKQuaternionMultiply(rot, netRot)
-//        
-//        let axis = GLKQuaternionAxis(rot)
-//        let angle = GLKQuaternionAngle(rot)
-//        
-//        cameraNode.rotation = SCNVector4Make(CGFloat(axis.x), CGFloat(axis.y), CGFloat(axis.z), CGFloat(angle))
     }
 }
 
+let rubiksCube = RubiksCube()
 let vc = CubeController(cube: rubiksCube)
 PlaygroundPage.current.liveView = vc
 
